@@ -5,7 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   CustomUser? _userFromUser(User user) {
-    return user != null ? CustomUser(uid: user.uid) : null;
+    return CustomUser(uid: user.uid);
   }
 
   //auth change user stream
@@ -13,8 +13,8 @@ class AuthService {
     return _auth.authStateChanges().map((User? user) => _userFromUser(user!));
   }
 
-  //sign in anonymously
-  Future signInAnon() async {
+  //sign in anonymously disabled for now
+  /*Future signInAnon() async {
     try {
       UserCredential userCredential = await _auth.signInAnonymously();
       User? user = userCredential.user;
@@ -23,7 +23,7 @@ class AuthService {
       print(e);
       return null;
     }
-  }
+  }*/
 
   //sign in with email and password
   Future signInWithEmailAndPass(String email, String password) async {
@@ -39,13 +39,13 @@ class AuthService {
   }
 
   //register with email and password
-  Future registerWithEmailAndPass(String email, String password) async {
+  Future registerWithEmailAndPass(String email, String password,
+      {String name = "New Crew Member"}) async {
     try {
       UserCredential userCredential = await _auth
           .createUserWithEmailAndPassword(email: email, password: password);
       User? user = userCredential.user;
-      await DatabaseService(uid: user?.uid)
-          .updateUserData("0", "New Crew Member", 100);
+      await DatabaseService(uid: user?.uid).updateUserData('0', name, 100);
       return _userFromUser(user!);
     } catch (e) {
       print(e);

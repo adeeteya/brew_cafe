@@ -1,4 +1,5 @@
 import 'package:brew_crew/models/custom_user.dart';
+import 'package:brew_crew/services/auth.dart';
 import 'package:brew_crew/services/database.dart';
 import 'package:brew_crew/shared/constants.dart';
 import 'package:brew_crew/shared/loading.dart';
@@ -12,6 +13,7 @@ class SettingsForm extends StatefulWidget {
 
 class _SettingsFormState extends State<SettingsForm> {
   final _formkey = GlobalKey<FormState>();
+  final AuthService _auth = AuthService();
   final List<String> sugars = ['0', '1', '2', '3', '4', '5'];
   String? _currentName;
   String? _currentSugars;
@@ -28,9 +30,13 @@ class _SettingsFormState extends State<SettingsForm> {
                 key: _formkey,
                 child: Column(
                   children: [
-                    Text("Update your Details", style: TextStyle(fontSize: 18)),
+                    Text("Update your Details",
+                        style:
+                            TextStyle(fontSize: 18, color: Color(0xFF212325))),
                     SizedBox(height: 20),
                     TextFormField(
+                      textInputAction: TextInputAction.next,
+                      style: TextStyle(color: Color(0xFFEADBCC)),
                       initialValue: userData?.name,
                       decoration:
                           textInputDecoration.copyWith(hintText: "Name"),
@@ -45,6 +51,8 @@ class _SettingsFormState extends State<SettingsForm> {
                     SizedBox(height: 20),
                     //dropdown
                     DropdownButtonFormField(
+                        dropdownColor: Color(0xFF212325),
+                        style: TextStyle(color: Color(0xFFEADBCC)),
                         decoration: textInputDecoration,
                         value: _currentSugars ?? userData?.sugars,
                         onChanged: (value) {
@@ -60,25 +68,38 @@ class _SettingsFormState extends State<SettingsForm> {
                         }).toList()),
                     SizedBox(height: 20),
                     //slider
-                    Slider.adaptive(
-                        min: 100,
-                        max: 900,
-                        divisions: 8,
-                        activeColor: Colors.brown[
-                            _currentStrength ?? (userData!.strength ?? 100)],
-                        inactiveColor: Colors.brown[
-                            _currentStrength ?? (userData!.strength ?? 100)],
-                        value: (_currentStrength ?? userData?.strength)!
-                            .toDouble(),
-                        onChanged: (val) {
-                          setState(() {
-                            _currentStrength = val.round();
-                          });
-                        }),
+                    Row(
+                      children: [
+                        CircleAvatar(
+                          backgroundImage: AssetImage('assets/coffee_icon.png'),
+                          radius: 25,
+                          backgroundColor: Colors.brown[
+                              _currentStrength ?? (userData!.strength ?? 100)],
+                        ),
+                        Expanded(
+                          child: Slider.adaptive(
+                              min: 100,
+                              max: 900,
+                              divisions: 8,
+                              activeColor: Colors.brown[_currentStrength ??
+                                  (userData!.strength ?? 100)],
+                              inactiveColor: Colors.brown[_currentStrength ??
+                                  (userData!.strength ?? 100)],
+                              value: (_currentStrength ?? userData?.strength)!
+                                  .toDouble(),
+                              onChanged: (val) {
+                                setState(() {
+                                  _currentStrength = val.round();
+                                });
+                              }),
+                        ),
+                      ],
+                    ),
                     ElevatedButton(
-                      child: Text("Update"),
+                      child: Text("Update",
+                          style: TextStyle(color: Color(0xFFD4A056))),
                       style:
-                          ElevatedButton.styleFrom(primary: Colors.pink[400]),
+                          ElevatedButton.styleFrom(primary: Color(0xFF212325)),
                       onPressed: () async {
                         if (_formkey.currentState!.validate()) {
                           await DatabaseService(uid: user!.uid).updateUserData(
@@ -86,6 +107,17 @@ class _SettingsFormState extends State<SettingsForm> {
                               _currentName ?? userData!.name,
                               _currentStrength ?? userData!.strength);
                         }
+                        Navigator.pop(context);
+                      },
+                    ),
+                    SizedBox(height: 20),
+                    ElevatedButton(
+                      child: Text("Logout",
+                          style: TextStyle(color: Color(0xFFD4A056))),
+                      style:
+                          ElevatedButton.styleFrom(primary: Color(0xFF212325)),
+                      onPressed: () async {
+                        await _auth.signOut();
                         Navigator.pop(context);
                       },
                     )

@@ -23,27 +23,35 @@ class _SignInState extends State<SignIn> {
     return loading
         ? Loading()
         : Scaffold(
-            backgroundColor: Colors.brown[300],
+            backgroundColor: Color(0xFFEADBCC),
             appBar: AppBar(
-              title: Text("Sign In to Brew Crew"),
+              title: RichText(
+                text: TextSpan(
+                    style: TextStyle(fontSize: 40, fontFamily: 'LouizeDisplay'),
+                    children: [
+                      TextSpan(
+                          text: "Brew",
+                          style: TextStyle(color: Color(0xFF212325))),
+                      TextSpan(
+                          text: "café",
+                          style: TextStyle(color: Color(0xFFD4A056)))
+                    ]),
+              ),
+              centerTitle: true,
               elevation: 0,
-              actions: [
-                ElevatedButton.icon(
-                    icon: Icon(Icons.person),
-                    onPressed: () {
-                      widget.toggleView!();
-                    },
-                    label: Text("Register"))
-              ],
             ),
             body: Container(
-              padding: EdgeInsets.symmetric(vertical: 20, horizontal: 50),
+              padding: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
               child: Form(
                 key: _formKey,
                 child: Column(
                   children: [
                     SizedBox(height: 20),
+                    Text(error,
+                        style: TextStyle(color: Colors.red, fontSize: 16)),
+                    SizedBox(height: 20),
                     TextFormField(
+                      style: TextStyle(color: Color(0xFFEADBCC)),
                       decoration:
                           textInputDecoration.copyWith(hintText: "Email"),
                       validator: (val) =>
@@ -56,10 +64,11 @@ class _SignInState extends State<SignIn> {
                     ),
                     SizedBox(height: 20),
                     TextFormField(
+                      style: TextStyle(color: Color(0xFFEADBCC)),
                       decoration:
                           textInputDecoration.copyWith(hintText: "Password"),
                       validator: (val) => val!.length < 6
-                          ? "Password contains more than 6 characters"
+                          ? "Password should contain more than 6 characters"
                           : null,
                       obscureText: true,
                       onChanged: (val) {
@@ -79,18 +88,24 @@ class _SignInState extends State<SignIn> {
                               email, password);
                           if (result == null) {
                             setState(() {
-                              error = "Invalid Credentials";
+                              error = "Invalid Credentials,Please Try Again";
                               loading = false;
                             });
                           }
                         }
                       },
-                      child: Text("Sign In"),
-                      style: ElevatedButton.styleFrom(primary: Colors.pink),
+                      child: Text("Log In",
+                          style: TextStyle(color: Color(0xFFD4A056))),
+                      style:
+                          ElevatedButton.styleFrom(primary: Color(0xFF212325)),
                     ),
-                    SizedBox(height: 20),
-                    Text(error,
-                        style: TextStyle(color: Colors.red, fontSize: 14)),
+                    SizedBox(height: 5),
+                    TextButton(
+                        onPressed: () {
+                          widget.toggleView!();
+                        },
+                        child: Text("Don't have a account yet?",
+                            style: TextStyle(fontSize: 16)))
                   ],
                 ),
               ),

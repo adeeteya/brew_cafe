@@ -17,81 +17,129 @@ class _RegisterState extends State<Register> {
   String email = '';
   String password = '';
   String error = '';
+  String name = "New Crew Member";
+  final List<String> sugarsList = ['0', '1', '2', '3', '4', '5'];
+  String sugars = '0';
+  int strength = 100;
   bool loading = false;
   @override
   Widget build(BuildContext context) {
     return loading
         ? Loading()
         : Scaffold(
-            backgroundColor: Colors.brown[300],
+            backgroundColor: Color(0xFFEADBCC),
             appBar: AppBar(
-              title: Text("Sign Up to Brew Crew"),
+              title: RichText(
+                text: TextSpan(
+                    style: TextStyle(fontSize: 40, fontFamily: 'LouizeDisplay'),
+                    children: [
+                      TextSpan(
+                          text: "Brew",
+                          style: TextStyle(color: Color(0xFF212325))),
+                      TextSpan(
+                          text: "café",
+                          style: TextStyle(color: Color(0xFFD4A056)))
+                    ]),
+              ),
+              centerTitle: true,
               elevation: 0,
-              actions: [
-                ElevatedButton.icon(
-                    icon: Icon(Icons.person),
-                    onPressed: () {
-                      widget.toggleView!();
-                    },
-                    label: Text("Sign In"))
-              ],
             ),
             body: Container(
-              padding: EdgeInsets.symmetric(vertical: 20, horizontal: 50),
+              padding: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
               child: Form(
                 key: _formKey,
-                child: Column(
-                  children: [
-                    SizedBox(height: 20),
-                    TextFormField(
-                      decoration:
-                          textInputDecoration.copyWith(hintText: "Email"),
-                      validator: (val) =>
-                          val!.isEmpty ? "Enter the email" : null,
-                      onChanged: (val) {
-                        setState(() {
-                          email = val;
-                        });
-                      },
-                    ),
-                    SizedBox(height: 20),
-                    TextFormField(
-                      decoration:
-                          textInputDecoration.copyWith(hintText: "Password"),
-                      validator: (val) =>
-                          val!.length < 6 ? "Password too short" : null,
-                      obscureText: true,
-                      onChanged: (val) {
-                        setState(() {
-                          password = val;
-                        });
-                      },
-                    ),
-                    SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () async {
-                        if (_formKey.currentState!.validate()) {
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      SizedBox(height: 20),
+                      Text(error,
+                          style: TextStyle(color: Colors.red, fontSize: 14)),
+                      SizedBox(height: 20),
+                      TextFormField(
+                        textInputAction: TextInputAction.next,
+                        style: TextStyle(color: Color(0xFFEADBCC)),
+                        decoration:
+                            textInputDecoration.copyWith(hintText: "Name"),
+                        validator: (val) =>
+                            val!.isEmpty ? "Please Enter your name" : null,
+                        onChanged: (val) {
                           setState(() {
-                            loading = true;
+                            name = val;
                           });
-                          dynamic result = await _auth.registerWithEmailAndPass(
-                              email, password);
-                          if (result == null) {
-                            //couldn't create account
+                        },
+                      ),
+                      SizedBox(height: 20),
+                      TextFormField(
+                        textInputAction: TextInputAction.next,
+                        style: TextStyle(color: Color(0xFFEADBCC)),
+                        decoration:
+                            textInputDecoration.copyWith(hintText: "Email"),
+                        validator: (val) =>
+                            val!.isEmpty ? "Enter a valid email" : null,
+                        onChanged: (val) {
+                          setState(() {
+                            email = val;
+                          });
+                        },
+                      ),
+                      SizedBox(height: 20),
+                      TextFormField(
+                        textInputAction: TextInputAction.next,
+                        style: TextStyle(color: Color(0xFFEADBCC)),
+                        decoration:
+                            textInputDecoration.copyWith(hintText: "Password"),
+                        validator: (val) =>
+                            val!.length < 6 ? "Password too short" : null,
+                        obscureText: true,
+                        onChanged: (val) {
+                          setState(() {
+                            password = val;
+                          });
+                        },
+                      ),
+                      SizedBox(height: 20),
+                      TextFormField(
+                        style: TextStyle(color: Color(0xFFEADBCC)),
+                        decoration: textInputDecoration.copyWith(
+                            hintText: "Re-Enter Password"),
+                        validator: (val) => val?.compareTo(password) != 0
+                            ? "Passwords Don't match"
+                            : null,
+                        obscureText: true,
+                      ),
+                      SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: () async {
+                          if (_formKey.currentState!.validate()) {
                             setState(() {
-                              error = "Enter a Valid Email";
-                              loading = false;
+                              loading = true;
                             });
+                            dynamic result = await _auth
+                                .registerWithEmailAndPass(email, password,
+                                    name: name);
+                            if (result == null) {
+                              //couldn't create account
+                              setState(() {
+                                error = "Enter a Valid Email";
+                                loading = false;
+                              });
+                            }
                           }
-                        }
-                      },
-                      child: Text("Register"),
-                      style: ElevatedButton.styleFrom(primary: Colors.pink),
-                    ),
-                    SizedBox(height: 20),
-                    Text(error,
-                        style: TextStyle(color: Colors.red, fontSize: 14)),
-                  ],
+                        },
+                        child: Text("Create a Account",
+                            style: TextStyle(color: Color(0xFFD4A056))),
+                        style: ElevatedButton.styleFrom(
+                            primary: Color(0xFF212325)),
+                      ),
+                      SizedBox(height: 5),
+                      TextButton(
+                          onPressed: () {
+                            widget.toggleView!();
+                          },
+                          child: Text("Already have a account?",
+                              style: TextStyle(fontSize: 16)))
+                    ],
+                  ),
                 ),
               ),
             ),

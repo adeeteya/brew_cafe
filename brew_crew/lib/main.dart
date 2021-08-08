@@ -21,8 +21,12 @@ class MyApp extends StatelessWidget {
       value: AuthService().user,
       initialData: null,
       child: MaterialApp(
-        debugShowCheckedModeBanner: true,
-        theme: ThemeData(primarySwatch: Colors.brown),
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          primaryColor: Color(0xFFEADBCC),
+          accentColor: Color(0xFF212325),
+          fontFamily: 'Axiforma',
+        ),
         home: Wrapper(),
       ),
     );

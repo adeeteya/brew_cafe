@@ -1,13 +1,11 @@
 import 'package:brew_crew/models/brew.dart';
 import 'package:brew_crew/screens/home/brew_list.dart';
 import 'package:brew_crew/screens/home/settings_form.dart';
-import 'package:brew_crew/services/auth.dart';
 import 'package:brew_crew/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class Home extends StatelessWidget {
-  final AuthService _auth = AuthService();
   @override
   Widget build(BuildContext context) {
     void _showSettingsPanel() {
@@ -15,8 +13,8 @@ class Home extends StatelessWidget {
           context: context,
           builder: (context) {
             return Container(
-                color: Colors.brown[50],
-                padding: EdgeInsets.symmetric(vertical: 20, horizontal: 60),
+                color: Color(0xFFEADBCC),
+                padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
                 child: SettingsForm());
           });
     }
@@ -26,23 +24,27 @@ class Home extends StatelessWidget {
       catchError: (_, __) => null,
       initialData: null,
       child: Scaffold(
-        backgroundColor: Colors.brown[300],
         appBar: AppBar(
-          title: Text("Brew Crew"),
+          backgroundColor: Colors.transparent,
+          title: RichText(
+            text: TextSpan(
+                style: TextStyle(fontSize: 40, fontFamily: 'LouizeDisplay'),
+                children: [
+                  TextSpan(
+                      text: "Brew", style: TextStyle(color: Color(0xFF212325))),
+                  TextSpan(
+                      text: "café", style: TextStyle(color: Color(0xFFD4A056)))
+                ]),
+          ),
+          centerTitle: true,
           elevation: 0,
           actions: [
-            ElevatedButton.icon(
-                icon: Icon(Icons.person),
-                onPressed: () async {
-                  await _auth.signOut();
-                },
-                label: Text("Logout")),
-            ElevatedButton.icon(
-                icon: Icon(Icons.settings),
-                onPressed: () {
-                  _showSettingsPanel();
-                },
-                label: Text("Settings")),
+            IconButton(
+              onPressed: () {
+                _showSettingsPanel();
+              },
+              icon: Icon(Icons.settings, color: Colors.black),
+            ),
           ],
         ),
         body: Container(
