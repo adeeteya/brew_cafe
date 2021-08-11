@@ -10,12 +10,10 @@ class Home extends StatelessWidget {
   Widget build(BuildContext context) {
     void _showSettingsPanel() {
       showModalBottomSheet(
+          isDismissible: false,
           context: context,
           builder: (context) {
-            return Container(
-                color: Color(0xFFEADBCC),
-                padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
-                child: SettingsForm());
+            return SettingsForm();
           });
     }
 
@@ -24,6 +22,7 @@ class Home extends StatelessWidget {
       catchError: (_, __) => null,
       initialData: null,
       child: Scaffold(
+        extendBodyBehindAppBar: true,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           title: RichText(

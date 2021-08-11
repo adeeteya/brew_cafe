@@ -33,8 +33,7 @@ class AuthService {
       User? user = userCredential.user;
       return _userFromUser(user!);
     } catch (e) {
-      print(e);
-      return null;
+      return e;
     }
   }
 
@@ -48,8 +47,7 @@ class AuthService {
       await DatabaseService(uid: user?.uid).updateUserData('0', name, 100);
       return _userFromUser(user!);
     } catch (e) {
-      print(e);
-      return null;
+      return e;
     }
   }
 

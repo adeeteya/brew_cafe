@@ -1,6 +1,8 @@
+import 'package:brew_crew/models/custom_user.dart';
 import 'package:brew_crew/services/auth.dart';
 import 'package:brew_crew/shared/constants.dart';
 import 'package:brew_crew/shared/loading.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class Register extends StatefulWidget {
@@ -44,103 +46,118 @@ class _RegisterState extends State<Register> {
               centerTitle: true,
               elevation: 0,
             ),
-            body: Container(
+            body: SingleChildScrollView(
               padding: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-              child: Form(
-                key: _formKey,
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      SizedBox(height: 20),
-                      Text(error,
-                          style: TextStyle(color: Colors.red, fontSize: 14)),
-                      SizedBox(height: 20),
-                      TextFormField(
-                        textInputAction: TextInputAction.next,
-                        style: TextStyle(color: Color(0xFFEADBCC)),
-                        decoration:
-                            textInputDecoration.copyWith(hintText: "Name"),
-                        validator: (val) =>
-                            val!.isEmpty ? "Please Enter your name" : null,
-                        onChanged: (val) {
-                          setState(() {
-                            name = val;
-                          });
-                        },
-                      ),
-                      SizedBox(height: 20),
-                      TextFormField(
-                        textInputAction: TextInputAction.next,
-                        style: TextStyle(color: Color(0xFFEADBCC)),
-                        decoration:
-                            textInputDecoration.copyWith(hintText: "Email"),
-                        validator: (val) =>
-                            val!.isEmpty ? "Enter a valid email" : null,
-                        onChanged: (val) {
-                          setState(() {
-                            email = val;
-                          });
-                        },
-                      ),
-                      SizedBox(height: 20),
-                      TextFormField(
-                        textInputAction: TextInputAction.next,
-                        style: TextStyle(color: Color(0xFFEADBCC)),
-                        decoration:
-                            textInputDecoration.copyWith(hintText: "Password"),
-                        validator: (val) =>
-                            val!.length < 6 ? "Password too short" : null,
-                        obscureText: true,
-                        onChanged: (val) {
-                          setState(() {
-                            password = val;
-                          });
-                        },
-                      ),
-                      SizedBox(height: 20),
-                      TextFormField(
-                        style: TextStyle(color: Color(0xFFEADBCC)),
-                        decoration: textInputDecoration.copyWith(
-                            hintText: "Re-Enter Password"),
-                        validator: (val) => val?.compareTo(password) != 0
-                            ? "Passwords Don't match"
-                            : null,
-                        obscureText: true,
-                      ),
-                      SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: () async {
-                          if (_formKey.currentState!.validate()) {
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Register", style: TextStyle(fontSize: 36)),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.15),
+                  Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        TextFormField(
+                          textInputAction: TextInputAction.next,
+                          style: TextStyle(color: Color(0xFFEADBCC)),
+                          decoration:
+                              textInputDecoration.copyWith(hintText: "Name"),
+                          validator: (val) =>
+                              val!.isEmpty ? "Please Enter your name" : null,
+                          onChanged: (val) {
                             setState(() {
-                              loading = true;
+                              name = val;
                             });
-                            dynamic result = await _auth
-                                .registerWithEmailAndPass(email, password,
-                                    name: name);
-                            if (result == null) {
-                              //couldn't create account
+                          },
+                        ),
+                        SizedBox(height: 5),
+                        TextFormField(
+                          textInputAction: TextInputAction.next,
+                          style: TextStyle(color: Color(0xFFEADBCC)),
+                          decoration:
+                              textInputDecoration.copyWith(hintText: "Email"),
+                          validator: (val) =>
+                              val!.isEmpty ? "Enter a valid email" : null,
+                          onChanged: (val) {
+                            setState(() {
+                              email = val;
+                            });
+                          },
+                        ),
+                        SizedBox(height: 5),
+                        TextFormField(
+                          textInputAction: TextInputAction.next,
+                          style: TextStyle(color: Color(0xFFEADBCC)),
+                          decoration: textInputDecoration.copyWith(
+                              hintText: "Password"),
+                          validator: (val) =>
+                              val!.length < 6 ? "Password too short" : null,
+                          obscureText: true,
+                          onChanged: (val) {
+                            setState(() {
+                              password = val;
+                            });
+                          },
+                        ),
+                        SizedBox(height: 5),
+                        TextFormField(
+                          style: TextStyle(color: Color(0xFFEADBCC)),
+                          decoration: textInputDecoration.copyWith(
+                              hintText: "Re-Enter Password"),
+                          validator: (val) => val?.compareTo(password) != 0
+                              ? "Passwords Don't match"
+                              : null,
+                          obscureText: true,
+                        ),
+                        SizedBox(height: 5),
+                        Text(error,
+                            style: TextStyle(color: Colors.red, fontSize: 16))
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.15),
+                  Column(
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        height: 50,
+                        margin: EdgeInsets.only(bottom: 5),
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            if (_formKey.currentState!.validate()) {
                               setState(() {
-                                error = "Enter a Valid Email";
-                                loading = false;
+                                loading = true;
                               });
+                              dynamic result = await _auth
+                                  .registerWithEmailAndPass(email, password,
+                                      name: name);
+                              if (result.runtimeType != CustomUser) {
+                                //couldn't create account
+                                FirebaseAuthException e = result;
+                                setState(() {
+                                  error = e.message ?? "Unknown Error Occurred";
+                                  loading = false;
+                                });
+                              }
                             }
-                          }
-                        },
-                        child: Text("Create a Account",
-                            style: TextStyle(color: Color(0xFFD4A056))),
-                        style: ElevatedButton.styleFrom(
-                            primary: Color(0xFF212325)),
+                          },
+                          child: Text("Create a Account",
+                              style: TextStyle(
+                                  color: Color(0xFFD4A056), fontSize: 16)),
+                          style: ElevatedButton.styleFrom(
+                              primary: Color(0xFF212325)),
+                        ),
                       ),
-                      SizedBox(height: 5),
                       TextButton(
                           onPressed: () {
                             widget.toggleView!();
                           },
                           child: Text("Already have a account?",
-                              style: TextStyle(fontSize: 16)))
+                              style: TextStyle(fontSize: 16))),
                     ],
-                  ),
-                ),
+                  )
+                ],
               ),
             ),
           );
